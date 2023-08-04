@@ -26,8 +26,8 @@ public:
       : oatpp::web::server::api::ApiController(objectMapper)
     {}
 
-    ENDPOINT("GET", "board", root) {
-        auto dto = BoardDto::createShared();
+    ENDPOINT("GET", "board/columns", root) {
+        auto dto = BoardColumnsDTO::createShared();
         dto->statusCode = 200;
         dto->message = "The board will be there soon";
         return createDtoResponse(Status::CODE_200, dto);

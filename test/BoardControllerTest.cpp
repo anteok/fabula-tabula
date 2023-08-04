@@ -27,10 +27,10 @@ void BoardControllerTest::onRun() {
         auto requestExecutor = oatpp::web::client::HttpRequestExecutor::createShared(clientConnectionProvider);
         auto client = TabulaApiTestClient::createShared(requestExecutor, objectMapper);
 
-        auto response = client->getBoard();
+        auto response = client->getBoardColumns();
         OATPP_ASSERT(response->getStatusCode() == 200);
 
-        auto message = response->readBodyToDto<oatpp::Object<BoardDto>>(objectMapper.get());
+        auto message = response->readBodyToDto<oatpp::Object<BoardColumnsDTO>>(objectMapper.get());
         OATPP_ASSERT(message);
         OATPP_ASSERT(message->statusCode == 200);
         OATPP_ASSERT(message->message == "The board will be there soon");

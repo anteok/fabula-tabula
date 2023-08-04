@@ -17,7 +17,7 @@
 class TabulaApiTestClient : public oatpp::web::client::ApiClient {
     API_CLIENT_INIT(TabulaApiTestClient)
 
-    API_CALL("GET", "/board", getBoard);
+    API_CALL("GET", "/board/columns", getBoardColumns);
 };
 
 #include OATPP_CODEGEN_END(ApiClient)

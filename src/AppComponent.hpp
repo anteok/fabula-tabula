@@ -5,12 +5,15 @@
 #ifndef TABULA_APPCOMPONENT_HPP
 #define TABULA_APPCOMPONENT_HPP
 
+#include "db/TabulaColumnsClient.hpp"
 #include "oatpp/parser/json/mapping/ObjectMapper.hpp"
 
 #include "oatpp/web/server/HttpConnectionHandler.hpp"
 #include "oatpp/network/tcp/server/ConnectionProvider.hpp"
+#include "oatpp-postgresql/orm.hpp"
 
 #include "oatpp/core/macro/component.hpp"
+
 
 /**
  * Class which creates and holds Application components and registers components in oatpp::base::Environment
@@ -47,6 +50,16 @@ public:
     OATPP_CREATE_COMPONENT(std::shared_ptr<oatpp::data::mapping::ObjectMapper>, apiObjectMapper) ([] {
         return oatpp::parser::json::mapping::ObjectMapper::createShared();
     } ());
+
+    /**
+     * Create DbClient component.
+     */
+    OATPP_CREATE_COMPONENT(std::shared_ptr<TabulaColumnsDbClient>, tabulaColumnsDbClient) ([] {
+        auto connectionProvider = std::make_shared<oatpp::postgresql::ConnectionProvider>(
+                "postgresql://admin:pass@127.0.0.1:5432/");
+        auto executor = std::make_shared<oatpp::postgresql::Executor>(connectionProvider);
+        return std::make_shared<TabulaColumnsDbClient>(executor);
+    }());
 
 };
 

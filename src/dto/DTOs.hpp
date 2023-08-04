@@ -17,9 +17,9 @@
 /**
  * Board Data-Transfer object
  */
-class BoardDto : public oatpp::DTO {
+class BoardColumnsDTO : public oatpp::DTO {
 
-    DTO_INIT(BoardDto, DTO);
+    DTO_INIT(BoardColumnsDTO, DTO);
 
     DTO_FIELD(Int32, statusCode);   // Status code field
     DTO_FIELD(String, message);     // Message field
