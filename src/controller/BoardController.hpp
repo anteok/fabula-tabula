@@ -27,9 +27,12 @@ public:
     {}
 
     ENDPOINT("GET", "board/columns", root) {
-        auto dto = BoardColumnsDTO::createShared();
-        dto->statusCode = 200;
-        dto->message = "The board will be there soon";
+        OATPP_COMPONENT(std::shared_ptr<TabulaColumnsDbClient>, dbClient);
+        auto columns = dbClient->getColumns();
+        auto dataset = columns->fetch<oatpp::Vector<Object<BoardColumnDTO>>>();
+
+        auto dto = BoardColumnsListDTO::createShared();
+        dto->columns = dataset;
         return createDtoResponse(Status::CODE_200, dto);
     }
 };

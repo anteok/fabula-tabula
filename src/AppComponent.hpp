@@ -56,7 +56,7 @@ public:
      */
     OATPP_CREATE_COMPONENT(std::shared_ptr<TabulaColumnsDbClient>, tabulaColumnsDbClient) ([] {
         auto connectionProvider = std::make_shared<oatpp::postgresql::ConnectionProvider>(
-                "postgresql://admin:pass@127.0.0.1:5432/");
+                "postgresql://admin:pass@127.0.0.1:5432/tabula");
         auto executor = std::make_shared<oatpp::postgresql::Executor>(connectionProvider);
         return std::make_shared<TabulaColumnsDbClient>(executor);
     }());

@@ -30,7 +30,7 @@ void BoardControllerTest::onRun() {
         auto response = client->getBoardColumns();
         OATPP_ASSERT(response->getStatusCode() == 200);
 
-        auto message = response->readBodyToDto<oatpp::Object<BoardColumnsDTO>>(objectMapper.get());
+        auto message = response->readBodyToDto<oatpp::Object<BoardColumnDTO>>(objectMapper.get());
         OATPP_ASSERT(message);
         OATPP_ASSERT(message->statusCode == 200);
         OATPP_ASSERT(message->message == "The board will be there soon");
