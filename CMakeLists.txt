@@ -37,6 +37,11 @@ target_link_libraries(${project_name}-test-lib
         PUBLIC oatpp::oatpp-test
 )
 
+# add definitions
+add_definitions(
+        -DDATABASE_MIGRATIONS="${CMAKE_CURRENT_SOURCE_DIR}/sql"
+)
+
 # add executables
 add_executable(${project_name}-exe
         src/App.cpp)
