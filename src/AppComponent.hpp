@@ -61,7 +61,7 @@ public:
                                                                               10,
                                                                               std::chrono::seconds(5));
         auto executor = std::make_shared<oatpp::postgresql::Executor>(connectionPool);
-        return std::make_shared<TabulaColumnsDbClient>(executor, true);
+        return std::make_shared<TabulaColumnsDbClient>(executor);
     }());
 
 };
