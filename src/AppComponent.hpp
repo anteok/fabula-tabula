@@ -6,8 +6,9 @@
 #define TABULA_APPCOMPONENT_HPP
 
 #include "db/TabulaColumnsClient.hpp"
-#include "oatpp/parser/json/mapping/ObjectMapper.hpp"
+#include "dto/configDto.hpp"
 
+#include "oatpp/parser/json/mapping/ObjectMapper.hpp"
 #include "oatpp/web/server/HttpConnectionHandler.hpp"
 #include "oatpp/network/tcp/server/ConnectionProvider.hpp"
 #include "oatpp-postgresql/orm.hpp"
@@ -23,10 +24,44 @@ class AppComponent {
 public:
 
     /**
+     * Config Component
+     */
+    OATPP_CREATE_COMPONENT(oatpp::Object<ConfigDto>, config)([this] {
+        const char* configPath = CONFIG_PATH;
+        auto objectMapper = oatpp::parser::json::mapping::ObjectMapper::createShared();
+
+        oatpp::String configText = oatpp::String::loadFromFile(configPath);
+        if (configText) {
+            auto profiles = objectMapper->readFromString<oatpp::Fields<oatpp::Object<ConfigDto>>>(configText);
+
+            const char *profileArg = std::getenv("CONFIG_PROFILE");
+            if (profileArg == nullptr) {
+                profileArg = "dev";
+            }
+
+            OATPP_LOGD("Server", "Loading configuration profile '%s'", profileArg);
+
+            auto profile = profiles.getValueByKey(profileArg, nullptr);
+            if (!profile) {
+                throw std::runtime_error("No configuration profile found. Server won't run.");
+            }
+            return profile;
+        }
+
+        OATPP_LOGE("AppComponent", "Can't load configuration file at path %s", configPath);
+        throw std::runtime_error("[AppComponent]: Can't load configuration file");
+    } ());
+
+    /**
      * Create ConnectionProvider component which listens on the port
      */
     OATPP_CREATE_COMPONENT(std::shared_ptr<oatpp::network::ServerConnectionProvider>, serverConnectionProvider) ([] {
-        return oatpp::network::tcp::server::ConnectionProvider::createShared({"localhost", 8000, oatpp::network::Address::IP_4});
+        OATPP_COMPONENT(oatpp::Object<ConfigDto>, config);
+        return oatpp::network::tcp::server::ConnectionProvider::createShared({
+            config->host,
+            config->port,
+            oatpp::network::Address::IP_4
+        });
     } ());
 
     /**
@@ -55,8 +90,9 @@ public:
      * Create DbClient component.
      */
     OATPP_CREATE_COMPONENT(std::shared_ptr<TabulaColumnsDbClient>, tabulaColumnsDbClient) ([] {
+        OATPP_COMPONENT(oatpp::Object<ConfigDto>, config);
         auto connectionProvider = std::make_shared<oatpp::postgresql::ConnectionProvider>(
-                "postgresql://admin:pass@127.0.0.1:5432/tabula");
+                config->dbConnectionString);
         auto connectionPool = oatpp::postgresql::ConnectionPool::createShared(connectionProvider,
                                                                               10,
                                                                               std::chrono::seconds(5));

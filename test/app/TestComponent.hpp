@@ -5,6 +5,7 @@
 #ifndef TABULA_TESTCOMPONENT_HPP
 #define TABULA_TESTCOMPONENT_HPP
 
+#include "db/TabulaColumnsClient.hpp"
 #include "oatpp/web/server/HttpConnectionHandler.hpp"
 
 #include "oatpp/network/virtual_/client/ConnectionProvider.hpp"

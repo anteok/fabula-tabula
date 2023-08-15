@@ -1,0 +1,8 @@
+{
+  "dev": {
+    "host": "0.0.0.0",
+    "port": 8000,
+    "swaggerHost": "localhost:8000",
+    "dbConnectionString": "postgresql://admin:pass@127.0.0.1:5432/tabula"
+  }
+}
