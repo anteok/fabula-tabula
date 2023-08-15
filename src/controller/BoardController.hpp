@@ -5,6 +5,7 @@
 #ifndef TABULA_BOARDCONTROLLER_HPP
 #define TABULA_BOARDCONTROLLER_HPP
 
+#include "db/TabulaColumnsClient.hpp"
 #include "dto/DTOs.hpp"
 
 #include "oatpp/web/server/api/ApiController.hpp"
