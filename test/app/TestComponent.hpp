@@ -5,6 +5,7 @@
 #ifndef TABULA_TESTCOMPONENT_HPP
 #define TABULA_TESTCOMPONENT_HPP
 
+#include "db/TabulaColumnsClient.hpp"
 #include "oatpp/web/server/HttpConnectionHandler.hpp"
 
 #include "oatpp/network/virtual_/client/ConnectionProvider.hpp"
@@ -13,12 +14,37 @@
 #include "oatpp/parser/json/mapping/ObjectMapper.hpp"
 
 #include "oatpp/core/macro/component.hpp"
+#include "AppComponent.hpp"
 
 /**
  * Test Components config
  */
 class TestComponent {
 public:
+
+    /**
+     * Config Component
+     */
+    OATPP_CREATE_COMPONENT(oatpp::Object<ConfigDto>, config)([this] {
+        const char* configPath = CONFIG_PATH;
+        auto objectMapper = oatpp::parser::json::mapping::ObjectMapper::createShared();
+
+        oatpp::String configText = oatpp::String::loadFromFile(configPath);
+        if (configText) {
+            auto profiles = objectMapper->readFromString<oatpp::Fields<oatpp::Object<ConfigDto>>>(configText);
+
+            OATPP_LOGD("Server", "Loading configuration profile test");
+
+            auto profile = profiles.getValueByKey("test", nullptr);
+            if (!profile) {
+                throw std::runtime_error("No configuration profile found. Server won't run.");
+            }
+            return profile;
+        }
+
+        OATPP_LOGE("AppComponent", "Can't load configuration file at path %s", configPath);
+        throw std::runtime_error("[AppComponent]: Can't load configuration file");
+    } ());
 
     /**
      * Create oatpp virtual network interface for test networking
@@ -65,6 +91,19 @@ public:
         return oatpp::parser::json::mapping::ObjectMapper::createShared();
     } ());
 
+    /**
+     * Create DbClient component.
+     */
+    OATPP_CREATE_COMPONENT(std::shared_ptr<TabulaColumnsDbClient>, tabulaColumnsDbClient) ([] {
+        OATPP_COMPONENT(oatpp::Object<ConfigDto>, config);
+        auto connectionProvider = std::make_shared<oatpp::postgresql::ConnectionProvider>(
+                config->dbConnectionString);
+        auto connectionPool = oatpp::postgresql::ConnectionPool::createShared(connectionProvider,
+                                                                              10,
+                                                                              std::chrono::seconds(5));
+        auto executor = std::make_shared<oatpp::postgresql::Executor>(connectionPool);
+        return std::make_shared<TabulaColumnsDbClient>(executor);
+    }());
 };
 
 #endif //TABULA_TESTCOMPONENT_HPP

@@ -17,12 +17,21 @@
 /**
  * Board Data-Transfer object
  */
-class BoardDto : public oatpp::DTO {
+class BoardColumnDTO : public oatpp::DTO {
 
-    DTO_INIT(BoardDto, DTO);
+    DTO_INIT(BoardColumnDTO, DTO);
 
-    DTO_FIELD(Int32, statusCode);   // Status code field
-    DTO_FIELD(String, message);     // Message field
+    DTO_FIELD(String, id);
+    DTO_FIELD(String, name);
+    DTO_FIELD(Boolean, active);
+    DTO_FIELD(Int16, order_num);
+};
+
+class BoardColumnsListDTO: public  oatpp::DTO  {
+
+    DTO_INIT(BoardColumnsListDTO, DTO);
+
+    DTO_FIELD(Vector<Object<BoardColumnDTO>>, columns);
 };
 
 #include OATPP_CODEGEN_END(DTO)

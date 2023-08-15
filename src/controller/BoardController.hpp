@@ -5,6 +5,7 @@
 #ifndef TABULA_BOARDCONTROLLER_HPP
 #define TABULA_BOARDCONTROLLER_HPP
 
+#include "db/TabulaColumnsClient.hpp"
 #include "dto/DTOs.hpp"
 
 #include "oatpp/web/server/api/ApiController.hpp"
@@ -26,10 +27,13 @@ public:
       : oatpp::web::server::api::ApiController(objectMapper)
     {}
 
-    ENDPOINT("GET", "board", root) {
-        auto dto = BoardDto::createShared();
-        dto->statusCode = 200;
-        dto->message = "The board will be there soon";
+    ENDPOINT("GET", "board/columns", root) {
+        OATPP_COMPONENT(std::shared_ptr<TabulaColumnsDbClient>, dbClient);
+        auto columns = dbClient->getColumns();
+        auto dataset = columns->fetch<oatpp::Vector<Object<BoardColumnDTO>>>();
+
+        auto dto = BoardColumnsListDTO::createShared();
+        dto->columns = dataset;
         return createDtoResponse(Status::CODE_200, dto);
     }
 };
